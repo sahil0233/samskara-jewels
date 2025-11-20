@@ -782,6 +782,82 @@
         "padding-block-end": 0
       }
     },
+    "testimonials_carousel_87CNXY": {
+      "type": "testimonials-carousel",
+      "blocks": {
+        "testimonial_nQMQmk": {
+          "type": "testimonial",
+          "settings": {
+            "image": "shopify://shop_images/IMG_8760.heic",
+            "customer_name": "Sahil Gangwani",
+            "customer_age": "",
+            "testimonial_text": "This is an amazing product! I love everything about it."
+          }
+        },
+        "testimonial_jHDUni": {
+          "type": "testimonial",
+          "settings": {
+            "customer_name": "Customer Name",
+            "customer_age": "",
+            "testimonial_text": "This is an amazing product! I love everything about it."
+          }
+        },
+        "testimonial_BPEcXT": {
+          "type": "testimonial",
+          "settings": {
+            "customer_name": "Customer Name",
+            "customer_age": "",
+            "testimonial_text": "This is an amazing product! I love everything about it."
+          }
+        },
+        "testimonial_RwmwyG": {
+          "type": "testimonial",
+          "settings": {
+            "customer_name": "Customer Name",
+            "customer_age": "",
+            "testimonial_text": "This is an amazing product! I love everything about it."
+          }
+        },
+        "testimonial_JQH4cR": {
+          "type": "testimonial",
+          "settings": {
+            "customer_name": "Customer Name",
+            "customer_age": "",
+            "testimonial_text": "This is an amazing product! I love everything about it."
+          }
+        },
+        "testimonial_kJMzxk": {
+          "type": "testimonial",
+          "settings": {
+            "customer_name": "Customer Name",
+            "customer_age": "",
+            "testimonial_text": "This is an amazing product! I love everything about it."
+          }
+        },
+        "testimonial_acjVfD": {
+          "type": "testimonial",
+          "settings": {
+            "customer_name": "Customer Name",
+            "customer_age": "",
+            "testimonial_text": "This is an amazing product! I love everything about it."
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_nQMQmk",
+        "testimonial_jHDUni",
+        "testimonial_BPEcXT",
+        "testimonial_RwmwyG",
+        "testimonial_JQH4cR",
+        "testimonial_kJMzxk",
+        "testimonial_acjVfD"
+      ],
+      "name": "Customer Testimonials",
+      "settings": {
+        "heading": "Customer Testimonials",
+        "color_scheme": ""
+      }
+    },
     "section_RLt9hR": {
       "type": "section",
       "blocks": {
@@ -874,6 +950,7 @@
     "section_DcAMiE",
     "product_list_FG6VnH",
     "section_AQKEze",
+    "testimonials_carousel_87CNXY",
     "section_RLt9hR"
   ]
 }
