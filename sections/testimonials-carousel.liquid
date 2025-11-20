@@ -1,0 +1,602 @@
+{{ 'section-testimonials.css' | asset_url | stylesheet_tag }}
+
+<div class="testimonials-section color-{{ section.settings.color_scheme }}">
+  <div class="page-width">
+    <div class="testimonials-header">
+      {% if section.settings.heading != blank %}
+        <h2 class="testimonials-heading">{{ section.settings.heading }}</h2>
+      {% endif %}
+    </div>
+
+    <div class="testimonials-carousel-wrapper">
+      <div class="testimonials-carousel" id="testimonials-{{ section.id }}">
+        {% for block in section.blocks %}
+          <div class="testimonial-card" {{ block.shopify_attributes }}>
+            <!-- Thread segment inside card -->
+            <svg class="card-thread" viewBox="0 0 100 60" preserveAspectRatio="none">
+              <path d="M0,30 Q25,15 50,30 T100,30" 
+                    stroke="#b8b8b8" 
+                    stroke-width="2.5" 
+                    fill="none"
+                    stroke-linecap="butt"/>
+            </svg>
+
+            <!-- Binder Clip -->
+            <div class="binder-clip">
+                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xml:space="preserve" width="30px" height="30px" fill="#B7B7B7" stroke="#B7B7B7"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <polygon style="fill:#d9d9d9;" points="50.144,261.278 177.669,261.278 129.32,451.299 50.144,451.299 "></polygon> <polygon style="fill:#d9d9d9;" points="334.331,261.278 382.68,451.299 129.32,451.299 177.669,261.278 "></polygon> <polygon style="fill:#d9d9d9;" points="461.856,303.505 461.856,451.299 382.68,451.299 334.331,261.278 461.856,261.278 "></polygon> </g> <path style="fill:#d9d9d9;" d="M504.082,493.526v10.557H7.918v-10.557v-31.67c0-5.806,4.751-10.557,10.557-10.557h31.67h79.175 H382.68h79.175h31.67c5.806,0,10.557,4.751,10.557,10.557V493.526z"></path> <path d="M493.526,443.381h-23.753V253.361H340.49l-28.091-110.632c16.432-14.864,25.416-36.287,25.416-60.914 C337.814,36.701,301.113,0,256,0s-81.814,36.701-81.814,81.814c0,24.628,8.985,46.05,25.416,60.914l-28.091,110.632H42.227v190.021 H18.474C8.288,443.381,0,451.67,0,461.856V512h512v-50.144C512,451.67,503.712,443.381,493.526,443.381z M453.938,295.588h-60.701 v15.835h60.701v131.959h-65.102l-44.32-174.186h109.422V295.588z M328.175,269.196l44.32,174.186H139.505l44.32-174.186H328.175z M217.436,136.832l-4.052-3.182c-15.067-11.832-23.364-30.241-23.364-51.836c0-36.381,29.599-65.979,65.979-65.979 s65.979,29.599,65.979,65.979c0,21.595-8.298,40.004-23.364,51.836l-4.052,3.182l29.588,116.529H187.848L217.436,136.832z M167.484,269.196l-44.32,174.186H58.062V311.423h60.701v-15.835H58.062v-26.392H167.484z M496.165,496.165H15.835v-34.309 c0-1.43,1.209-2.639,2.639-2.639h475.052c1.43,0,2.639,1.209,2.639,2.639V496.165z"></path> <rect x="208.495" y="295.588" width="95.01" height="15.835"></rect> </g></svg>
+            </div>
+
+            <div class="testimonial-card-inner">
+              <div class="testimonial-image-wrapper">
+                {% if block.settings.image != blank %}
+                  <img
+                    src="{{ block.settings.image | image_url: width: 400 }}"
+                    alt="{{ block.settings.customer_name }}"
+                    loading="lazy"
+                    width="400"
+                    height="400"
+                  >
+                {% else %}
+                  <div class="testimonial-placeholder">
+                    {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="testimonial-content">
+                <div class="testimonial-author">
+                  <h3 class="testimonial-name">{{ block.settings.customer_name }}</h3>
+                  {% if block.settings.customer_age != blank %}
+                    <span class="testimonial-age">, {{ block.settings.customer_age }}</span>
+                  {% endif %}
+                </div>
+
+                {% if block.settings.testimonial_text != blank %}
+                  <p class="testimonial-text">{{ block.settings.testimonial_text }}</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const carousel = document.getElementById('testimonials-{{ section.id }}');
+    const cards = carousel.querySelectorAll('.testimonial-card');
+    const totalCards = cards.length;
+    
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    let startTime;
+    let velocity = 0;
+    let momentumID;
+
+    // Mouse events
+    carousel.addEventListener('mousedown', (e) => {
+      isDown = true;
+      carousel.style.cursor = 'grabbing';
+      startX = e.pageX - carousel.offsetLeft;
+      scrollLeft = carousel.scrollLeft;
+      startTime = Date.now();
+      cancelMomentumTracking();
+    });
+
+    carousel.addEventListener('mouseleave', () => {
+      isDown = false;
+      carousel.style.cursor = 'grab';
+    });
+
+    carousel.addEventListener('mouseup', () => {
+      isDown = false;
+      carousel.style.cursor = 'grab';
+      beginMomentumTracking();
+    });
+
+    carousel.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - carousel.offsetLeft;
+      const walk = (x - startX) * 2;
+      const prevScrollLeft = carousel.scrollLeft;
+      carousel.scrollLeft = scrollLeft - walk;
+      
+      velocity = carousel.scrollLeft - prevScrollLeft;
+    });
+
+    // Touch events
+    let touchStartX = 0;
+    let touchScrollLeft = 0;
+
+    carousel.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].pageX;
+      touchScrollLeft = carousel.scrollLeft;
+      startTime = Date.now();
+      cancelMomentumTracking();
+    });
+
+    carousel.addEventListener('touchmove', (e) => {
+      const x = e.touches[0].pageX;
+      const walk = (touchStartX - x) * 1.5;
+      const prevScrollLeft = carousel.scrollLeft;
+      carousel.scrollLeft = touchScrollLeft + walk;
+      
+      velocity = carousel.scrollLeft - prevScrollLeft;
+    });
+
+    carousel.addEventListener('touchend', () => {
+      beginMomentumTracking();
+    });
+
+    function beginMomentumTracking() {
+      cancelMomentumTracking();
+      momentumID = requestAnimationFrame(momentumLoop);
+    }
+
+    function cancelMomentumTracking() {
+      cancelAnimationFrame(momentumID);
+    }
+
+    function momentumLoop() {
+      carousel.scrollLeft += velocity;
+      velocity *= 0.95;
+      
+      if (Math.abs(velocity) > 0.5) {
+        momentumID = requestAnimationFrame(momentumLoop);
+      }
+    }
+  })();
+</script>
+
+<style>
+.testimonials-section {
+  padding: 60px 0 80px;
+  background: #fef5f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonials-header {
+  text-align: center;
+}
+
+.testimonials-heading {
+  font-size: 36px;
+  font-weight: 500;
+  color: #2c3e50;
+  margin: 0;
+  font-family: serif;
+}
+
+.testimonials-carousel-wrapper {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0 0px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.testimonials-carousel-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.testimonials-carousel {
+  display: flex;
+  gap: 0;
+  padding: 40px 0;
+  cursor: grab;
+  user-select: none;
+}
+
+.testimonial-card {
+  flex: 0 0 320px;
+  min-width: 320px;
+  max-width: 320px;
+  position: relative;
+  padding: 0 48px;
+}
+
+/* Thread inside each card */
+.card-thread {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Binder Clip */
+.binder-clip {
+  position: absolute;
+  top: 15px;
+  
+  z-index: 15;
+}
+
+/* Binder clip on left for odd cards */
+.testimonial-card:nth-child(odd) .binder-clip {
+  left: 60px;
+}
+
+/* Binder clip on right for even cards */
+.testimonial-card:nth-child(even) .binder-clip {
+  right: 60px;
+}
+
+.clip-handle {
+  position: absolute;
+  width: 10px;
+  height: 22px;
+  background: linear-gradient(90deg, #c0c0c0 0%, #909090 50%, #707070 100%);
+  border-radius: 5px;
+  top: 0;
+  box-shadow: 
+    0 1px 3px rgba(0,0,0,0.2),
+    inset -1px 0 1px rgba(255,255,255,0.3);
+}
+.testimonial-card-inner {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  padding: 20px 15px 15px;
+  margin-top: 40px;
+  z-index: 10;
+  box-shadow: 
+    0 4px 12px rgba(0,0,0,0.1),
+    0 1px 3px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform: rotate(0deg);
+}
+
+.testimonial-card:nth-child(odd) .testimonial-card-inner {
+  transform: rotate(8deg);
+}
+
+.testimonial-card:nth-child(even) .testimonial-card-inner {
+  transform: rotate(-8deg);
+}
+
+.testimonial-card:hover .testimonial-card-inner {
+  transform: rotate(0deg) translateY(-5px);
+  box-shadow: 
+    0 8px 20px rgba(0,0,0,0.15),
+    0 2px 6px rgba(0,0,0,0.1);
+}
+
+.testimonial-image-wrapper {
+  position: relative;
+  margin: 0 auto 15px;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+}
+
+.testimonial-image-wrapper img,
+.testimonial-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.testimonial-placeholder svg {
+  width: 100%;
+  height: 100%;
+}
+
+.testimonial-content {
+  text-align: left;
+}
+
+.testimonial-author {
+  margin-bottom: 10px;
+}
+
+.testimonial-name {
+  display: inline;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.testimonial-age {
+  font-size: 15px;
+  color: #7f8c8d;
+  font-weight: 400;
+}
+
+.testimonial-text {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #5a6c7d;
+  margin: 0;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: 2px solid #e0e0e0;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  z-index: 20;
+  color: #2c3e50;
+}
+
+.carousel-nav:hover:not(:disabled) {
+  background: #2c3e50;
+  border-color: #2c3e50;
+  color: white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.carousel-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carousel-prev {
+  left: 5px;
+}
+
+.carousel-next {
+  right: 5px;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 35px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d0d0d0;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.dot.active {
+  background: #2c3e50;
+  width: 30px;
+  border-radius: 5px;
+}
+
+.dot:hover {
+  background: #a0a0a0;
+}
+
+.carousel-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: 2px solid #e0e0e0;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  z-index: 20;
+  color: #2c3e50;
+}
+
+.carousel-nav:hover:not(:disabled) {
+  background: #2c3e50;
+  border-color: #2c3e50;
+  color: white;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.carousel-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carousel-prev {
+  left: 5px;
+}
+
+.carousel-next {
+  right: 5px;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 35px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #d0d0d0;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.dot.active {
+  background: #2c3e50;
+  width: 30px;
+  border-radius: 5px;
+}
+
+.dot:hover {
+  background: #a0a0a0;
+}
+
+/* Responsive */
+/* @media (max-width: 1199px) {
+  .testimonial-card {
+    flex: 0 0 280px;
+    min-width: 280px;
+    max-width: 280px;
+  }
+} */
+
+/* @media (max-width: 989px) {
+  .testimonial-card {
+    flex: 0 0 240px;
+    min-width: 240px;
+    max-width: 240px;
+  } */
+  
+  .testimonials-heading {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 749px) {
+  .testimonials-section {
+    padding: 40px 0 60px;
+  }
+  
+  .testimonial-card {
+    flex: 0 0 220px;
+    min-width: 220px;
+    max-width: 220px;
+    padding: 0 10px;
+  }
+  
+  .testimonial-card-inner {
+    padding: 15px 12px 12px;
+  }
+  
+  .testimonial-image-wrapper {
+    height: 140px;
+    margin: 0 auto 12px;
+  }
+  
+  .testimonial-name {
+    font-size: 14px;
+  }
+  
+  .testimonial-age {
+    font-size: 14px;
+  }
+  
+  .testimonial-text {
+    font-size: 12px;
+  }
+  
+  .testimonials-heading {
+    font-size: 26px;
+  }
+  
+  .carousel-nav {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .carousel-prev {
+    left: -5px;
+  }
+  
+  .carousel-next {
+    right: -5px;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Customer Testimonials",
+  "tag": "section",
+  "class": "section-testimonials",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Customer Testimonials"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "background-1"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Customer Image"
+        },
+        {
+          "type": "text",
+          "id": "customer_name",
+          "label": "Customer Name",
+          "default": "Customer Name"
+        },
+        {
+          "type": "text",
+          "id": "customer_age",
+          "label": "Age"
+        },
+        {
+          "type": "textarea",
+          "id": "testimonial_text",
+          "label": "Testimonial Text",
+          "default": "This is an amazing product! I love everything about it."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
