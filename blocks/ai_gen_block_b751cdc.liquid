@@ -1,0 +1,680 @@
+{% doc %}
+  @prompt
+    multimedia collage
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-multimedia-collage-{{ ai_gen_id }} {
+    padding: {{ block.settings.section_padding }}px 0;
+    background-color: {{ block.settings.background_color }};
+  }
+
+  .ai-multimedia-collage__container-{{ ai_gen_id }} {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ai-multimedia-collage__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: {{ block.settings.grid_gap }}px;
+    position: relative;
+  }
+
+  .ai-multimedia-collage__item-{{ ai_gen_id }} {
+    position: relative;
+    overflow: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+    background-color: {{ block.settings.item_background }};
+  }
+
+  .ai-multimedia-collage__item-1-{{ ai_gen_id }} {
+    grid-column: span 7;
+    grid-row: span 2;
+  }
+
+  .ai-multimedia-collage__item-2-{{ ai_gen_id }} {
+    grid-column: span 5;
+    grid-row: span 1;
+  }
+
+  .ai-multimedia-collage__item-3-{{ ai_gen_id }} {
+    grid-column: span 5;
+    grid-row: span 1;
+  }
+
+  .ai-multimedia-collage__item-4-{{ ai_gen_id }} {
+    grid-column: span 4;
+    grid-row: span 1;
+  }
+
+  .ai-multimedia-collage__item-5-{{ ai_gen_id }} {
+    grid-column: span 8;
+    grid-row: span 1;
+  }
+
+  .ai-multimedia-collage__media-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+  }
+
+  .ai-multimedia-collage__image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-multimedia-collage__video-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-multimedia-collage__placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-multimedia-collage__placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 200px;
+    opacity: 0.3;
+  }
+
+  .ai-multimedia-collage__empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .ai-multimedia-collage__overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, {{ block.settings.overlay_opacity | divided_by: 100.0 }}) 100%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: {{ block.settings.content_padding }}px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-multimedia-collage__item-{{ ai_gen_id }}:hover .ai-multimedia-collage__overlay-{{ ai_gen_id }} {
+    opacity: 1;
+  }
+
+  .ai-multimedia-collage__title-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    line-height: 1.2;
+  }
+
+  .ai-multimedia-collage__description-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.description_size }}px;
+    margin: 0 0 16px;
+    line-height: 1.4;
+  }
+
+  .ai-multimedia-collage__link-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-multimedia-collage__link-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-multimedia-collage__item-1-{{ ai_gen_id }},
+    .ai-multimedia-collage__item-2-{{ ai_gen_id }},
+    .ai-multimedia-collage__item-3-{{ ai_gen_id }},
+    .ai-multimedia-collage__item-4-{{ ai_gen_id }},
+    .ai-multimedia-collage__item-5-{{ ai_gen_id }} {
+      grid-column: span 6;
+      grid-row: span 1;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-multimedia-collage__item-1-{{ ai_gen_id }},
+    .ai-multimedia-collage__item-2-{{ ai_gen_id }},
+    .ai-multimedia-collage__item-3-{{ ai_gen_id }},
+    .ai-multimedia-collage__item-4-{{ ai_gen_id }},
+    .ai-multimedia-collage__item-5-{{ ai_gen_id }} {
+      grid-column: span 12;
+    }
+
+    .ai-multimedia-collage__media-wrapper-{{ ai_gen_id }} {
+      min-height: 250px;
+    }
+
+    .ai-multimedia-collage__overlay-{{ ai_gen_id }} {
+      opacity: 1;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-multimedia-collage-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-multimedia-collage__container-{{ ai_gen_id }}">
+    <div class="ai-multimedia-collage__grid-{{ ai_gen_id }}">
+      {% for i in (1..5) %}
+        {% liquid
+          assign image_key = 'item_' | append: i | append: '_image'
+          assign video_key = 'item_' | append: i | append: '_video'
+          assign title_key = 'item_' | append: i | append: '_title'
+          assign description_key = 'item_' | append: i | append: '_description'
+          assign link_key = 'item_' | append: i | append: '_link'
+          assign link_text_key = 'item_' | append: i | append: '_link_text'
+          assign media_type_key = 'item_' | append: i | append: '_media_type'
+
+          assign item_image = block.settings[image_key]
+          assign item_video = block.settings[video_key]
+          assign item_title = block.settings[title_key]
+          assign item_description = block.settings[description_key]
+          assign item_link = block.settings[link_key]
+          assign item_link_text = block.settings[link_text_key]
+          assign media_type = block.settings[media_type_key]
+        %}
+
+        <div class="ai-multimedia-collage__item-{{ ai_gen_id }} ai-multimedia-collage__item-{{ i }}-{{ ai_gen_id }}">
+          <div class="ai-multimedia-collage__media-wrapper-{{ ai_gen_id }}">
+            {% if media_type == 'image' %}
+              {% if item_image %}
+                <img
+                  src="{{ item_image | image_url: width: 1200 }}"
+                  alt="{{ item_image.alt | escape }}"
+                  loading="lazy"
+                  width="{{ item_image.width }}"
+                  height="{{ item_image.height }}"
+                  class="ai-multimedia-collage__image-{{ ai_gen_id }}"
+                >
+              {% else %}
+                <div class="ai-multimedia-collage__placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                  <div class="ai-multimedia-collage__empty-state-{{ ai_gen_id }}">
+                    Add an image
+                  </div>
+                </div>
+              {% endif %}
+            {% elsif media_type == 'video' %}
+              {% if item_video %}
+                <video
+                  class="ai-multimedia-collage__video-{{ ai_gen_id }}"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                >
+                  <source src="{{ item_video }}" type="video/mp4">
+                </video>
+              {% else %}
+                <div class="ai-multimedia-collage__placeholder-{{ ai_gen_id }}">
+                  {{ 'image' | placeholder_svg_tag }}
+                  <div class="ai-multimedia-collage__empty-state-{{ ai_gen_id }}">
+                    Add a video URL
+                  </div>
+                </div>
+              {% endif %}
+            {% endif %}
+
+            {% if item_title != blank or item_description != blank or item_link != blank %}
+              <div class="ai-multimedia-collage__overlay-{{ ai_gen_id }}">
+                {% if item_title != blank %}
+                  <h3 class="ai-multimedia-collage__title-{{ ai_gen_id }}">{{ item_title }}</h3>
+                {% endif %}
+                {% if item_description != blank %}
+                  <div class="ai-multimedia-collage__description-{{ ai_gen_id }}">{{ item_description }}</div>
+                {% endif %}
+                {% if item_link != blank and item_link_text != blank %}
+                  <a href="{{ item_link }}" class="ai-multimedia-collage__link-{{ ai_gen_id }}">
+                    {{ item_link_text }}
+                  </a>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Multimedia collage",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Section padding",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "item_background",
+      "label": "Item background",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 70
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "px",
+      "label": "Content padding",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 14,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Background",
+      "default": "#2f3a21"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Hover background",
+      "default": "#1a2113"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Item 1"
+    },
+    {
+      "type": "select",
+      "id": "item_1_media_type",
+      "label": "Media type",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
+        }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "item_1_video",
+      "label": "Video URL"
+    },
+    {
+      "type": "text",
+      "id": "item_1_title",
+      "label": "Title",
+      "default": "Featured Collection"
+    },
+    {
+      "type": "textarea",
+      "id": "item_1_description",
+      "label": "Description",
+      "default": "Discover our latest arrivals"
+    },
+    {
+      "type": "url",
+      "id": "item_1_link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "item_1_link_text",
+      "label": "Link text",
+      "default": "Shop now"
+    },
+    {
+      "type": "header",
+      "content": "Item 2"
+    },
+    {
+      "type": "select",
+      "id": "item_2_media_type",
+      "label": "Media type",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
+        }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "item_2_video",
+      "label": "Video URL"
+    },
+    {
+      "type": "text",
+      "id": "item_2_title",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "item_2_description",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "item_2_link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "item_2_link_text",
+      "label": "Link text",
+      "default": "Explore"
+    },
+    {
+      "type": "header",
+      "content": "Item 3"
+    },
+    {
+      "type": "select",
+      "id": "item_3_media_type",
+      "label": "Media type",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
+        }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "item_3_video",
+      "label": "Video URL"
+    },
+    {
+      "type": "text",
+      "id": "item_3_title",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "item_3_description",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "item_3_link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "item_3_link_text",
+      "label": "Link text",
+      "default": "View more"
+    },
+    {
+      "type": "header",
+      "content": "Item 4"
+    },
+    {
+      "type": "select",
+      "id": "item_4_media_type",
+      "label": "Media type",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
+        }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_4_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "item_4_video",
+      "label": "Video URL"
+    },
+    {
+      "type": "text",
+      "id": "item_4_title",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "item_4_description",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "item_4_link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "item_4_link_text",
+      "label": "Link text",
+      "default": "Discover"
+    },
+    {
+      "type": "header",
+      "content": "Item 5"
+    },
+    {
+      "type": "select",
+      "id": "item_5_media_type",
+      "label": "Media type",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
+        }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "item_5_image",
+      "label": "Image"
+    },
+    {
+      "type": "url",
+      "id": "item_5_video",
+      "label": "Video URL"
+    },
+    {
+      "type": "text",
+      "id": "item_5_title",
+      "label": "Title"
+    },
+    {
+      "type": "textarea",
+      "id": "item_5_description",
+      "label": "Description"
+    },
+    {
+      "type": "url",
+      "id": "item_5_link",
+      "label": "Link"
+    },
+    {
+      "type": "text",
+      "id": "item_5_link_text",
+      "label": "Link text",
+      "default": "Learn more"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Multimedia collage"
+    }
+  ],
+  "tag": null
+}
+{% endschema %}
